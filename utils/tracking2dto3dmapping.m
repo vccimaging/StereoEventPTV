@@ -4,16 +4,16 @@ for i = 1 : iter_num
     peaknum = [peaknum;[length(framepeak_left(i).peak),length(framepeak_right(i).peak)]];
 end
 traj_num = max(peaknum(:));
-pos_history_master = zeros(traj_num,2,iter_num);
-vol_master = zeros(traj_num,2,iter_num);
-pos_history_slave = zeros(traj_num,2,iter_num);
-vol_slave = zeros(traj_num,2,iter_num);
+pos_history_left = zeros(traj_num,2,iter_num);
+vol_left = zeros(traj_num,2,iter_num);
+pos_history_right = zeros(traj_num,2,iter_num);
+vol_right = zeros(traj_num,2,iter_num);
 
 for i = 1 : iter_num
-    pos_history_master(1:peaknum(i,1),:,i) = framepeak_left(i).peak_current;
-    vol_master(1:peaknum(i,1),:,i) = framepeak_left(i).vel_est;
-    pos_history_slave(1:peaknum(i,2),:,i) = framepeak_right(i).peak_current;
-    vol_slave(1:peaknum(i,2),:,i) = framepeak_right(i).vel_est;
+    pos_history_left(1:peaknum(i,1),:,i) = framepeak_left(i).peak_current;
+    vol_left(1:peaknum(i,1),:,i) = framepeak_left(i).vel_est;
+    pos_history_right(1:peaknum(i,2),:,i) = framepeak_right(i).peak_current;
+    vol_right(1:peaknum(i,2),:,i) = framepeak_right(i).vel_est;
 end
 
 
@@ -59,7 +59,7 @@ end
 
 mindis = 5;
 parapairs=cell(frame_num,1);
-indexvalue = 1:size(pos_history_master,1);
+indexvalue = 1:size(pos_history_left,1);
 %% 3D mapping
 fprintf('processing frame ');
 for frame = frame_start : frame_stop
@@ -67,35 +67,35 @@ for frame = frame_start : frame_stop
     % frame = 1;
     fprintf('%d..',frame);
     frame_idx = frame - frame_start+1;
-    pos_master_current = pos_history_master(:, :,frame_idx);
-    vol_master_current = vol_master(:,:,frame_idx);
+    pos_left_current = pos_history_left(:, :,frame_idx);
+    vol_left_current = vol_left(:,:,frame_idx);
     
-    pos_slave_current = pos_history_slave(:,:,frame_idx);
-    vol_slave_current = vol_slave(:,:,frame_idx);
+    pos_right_current = pos_history_right(:,:,frame_idx);
+    vol_right_current = vol_right(:,:,frame_idx);
     
-    pos_marker = pos_master_current(:,1)~=0;
-    pos_master_current = pos_master_current(pos_marker,:);
-    vol_master_current = vol_master_current(pos_marker,:);
+    pos_marker = pos_left_current(:,1)~=0;
+    pos_left_current = pos_left_current(pos_marker,:);
+    vol_left_current = vol_left_current(pos_marker,:);
     
-    pos_marker = pos_slave_current(:,1) ~=0;
-    pos_slave_current = pos_slave_current(pos_marker, :);
-    vol_slave_current = vol_slave_current(pos_marker, :);
+    pos_marker = pos_right_current(:,1) ~=0;
+    pos_right_current = pos_right_current(pos_marker, :);
+    vol_right_current = vol_right_current(pos_marker, :);
     
-    pos_master_size = size(pos_master_current,1);
-    pos_slave_size = size(pos_slave_current,1);
-    index_master = 1 : pos_master_size;
-    index_slave = 1 : pos_slave_size;
-    occup_matrix_left = zeros(pos_master_size,pos_slave_size);
-    occup_matrix_right = zeros(pos_master_size,pos_slave_size);
-    dist_matrix_left = zeros(pos_master_size,pos_slave_size);
-    dist_matrix_right= zeros(pos_master_size,pos_slave_size);
-    min_dis_master = [];
-    min_dis_slave = [];
-    for i = 1 : pos_master_size
-        A_matrix = [trans1(1,1)-trans1(1,3)*pos_master_current(i,1), trans1(2,1) - trans1(2,3)*pos_master_current(i,1);...
-            trans1(1,2)-trans1(1,3)*pos_master_current(i,2), trans1(2,2) - trans1(2,3)*pos_master_current(i,2)];
-        b_matrix = [trans1(3,3)*pos_master_current(i,1)*z_res + pos_master_current(i,1) - trans1(3,1) * z_res - trans1(4,1);...
-            trans1(3,3)*pos_master_current(i,2)*z_res + pos_master_current(i,2) - trans1(3,2) * z_res - trans1(4,2)];
+    pos_left_size = size(pos_left_current,1);
+    pos_right_size = size(pos_right_current,1);
+    index_left = 1 : pos_left_size;
+    index_right = 1 : pos_right_size;
+    occup_matrix_left = zeros(pos_left_size,pos_right_size);
+    occup_matrix_right = zeros(pos_left_size,pos_right_size);
+    dist_matrix_left = zeros(pos_left_size,pos_right_size);
+    dist_matrix_right= zeros(pos_left_size,pos_right_size);
+    min_dis_left = [];
+    min_dis_right = [];
+    for i = 1 : pos_left_size
+        A_matrix = [trans1(1,1)-trans1(1,3)*pos_left_current(i,1), trans1(2,1) - trans1(2,3)*pos_left_current(i,1);...
+            trans1(1,2)-trans1(1,3)*pos_left_current(i,2), trans1(2,2) - trans1(2,3)*pos_left_current(i,2)];
+        b_matrix = [trans1(3,3)*pos_left_current(i,1)*z_res + pos_left_current(i,1) - trans1(3,1) * z_res - trans1(4,1);...
+            trans1(3,3)*pos_left_current(i,2)*z_res + pos_left_current(i,2) - trans1(3,2) * z_res - trans1(4,2)];
         point_mapping = inv(A_matrix) * b_matrix;
         point_mapping_index = point_mapping(1,:) >= boundaries(:,1)' & point_mapping(1,:) <= boundaries(:,3)' & ...
             point_mapping(2,:) >= boundaries(:,2)' & point_mapping(2,:) <= boundaries(:,4)';
@@ -106,16 +106,16 @@ for frame = frame_start : frame_stop
         point_right = point_right(:,1:2)./point_right(:,3);
         if size(point_right,1) > 2
             pf = polyfit(point_right(:,1),point_right(:,2),1);
-            vec2 = [pos_slave_current(:,1) - point_right(1,1), pos_slave_current(:,2) - point_right(1,2)];
+            vec2 = [pos_right_current(:,1) - point_right(1,1), pos_right_current(:,2) - point_right(1,2)];
             vec1 = [point_right(end,1) - point_right(1,1), point_right(end,2) - point_right(1,2)];
             d = vec1(1)^2 + vec1(2)^2;
             min_dist = zeros(size(vec2, 1),1);
             r = (vec1(1)*vec2(:,1) + vec1(2)*vec2(:,2))/d;
             for j = 1 : size(vec2, 1)
                 if r(j) <= 0
-                    min_dist(j) = sqrt((pos_slave_current(j,1) - point_right(1,1))^2 + (pos_slave_current(j,2) - point_right(1,2))^2);
+                    min_dist(j) = sqrt((pos_right_current(j,1) - point_right(1,1))^2 + (pos_right_current(j,2) - point_right(1,2))^2);
                 elseif r(j) >=1
-                    min_dist(j) = sqrt((pos_slave_current(j,1) - point_right(end,1))^2 + (pos_slave_current(j,2) - point_right(end,2))^2);
+                    min_dist(j) = sqrt((pos_right_current(j,1) - point_right(end,1))^2 + (pos_right_current(j,2) - point_right(end,2))^2);
                 else
                     theta = (vec2(j,:) * vec1')/(norm(vec2(j,:)) * norm(vec1));
                     if theta >=1
@@ -124,7 +124,7 @@ for frame = frame_start : frame_stop
                         theta = -1;
                     end
                     
-                    min_dist(j) = sqrt((pos_slave_current(j,1) - point_right(1,1))^2 + (pos_slave_current(j,2) - point_right(1,2))^2) * sin(acos(theta));
+                    min_dist(j) = sqrt((pos_right_current(j,1) - point_right(1,1))^2 + (pos_right_current(j,2) - point_right(1,2))^2) * sin(acos(theta));
                 end
             end
             index1 = min_dist < mindis;
@@ -135,11 +135,11 @@ for frame = frame_start : frame_stop
         end
         
     end
-    for i = 1 : pos_slave_size
-        A_matrix = [trans2(1,1) - trans2(1,3)*pos_slave_current(i,1), trans2(2,1)-trans2(2,3)*pos_slave_current(i,1);...
-            trans2(1,2) - trans2(1,3)*pos_slave_current(i,2), trans2(2,2)-trans2(2,3)*pos_slave_current(i,2)];
-        b_matrix = [trans2(3,3)*pos_slave_current(i,1)*z_res + pos_slave_current(i,1) - trans2(3,1)*z_res - trans2(4,1);...
-            trans2(3,3)*pos_slave_current(i,2)*z_res + pos_slave_current(i,2) - trans2(3,2)*z_res - trans2(4,2)];
+    for i = 1 : pos_right_size
+        A_matrix = [trans2(1,1) - trans2(1,3)*pos_right_current(i,1), trans2(2,1)-trans2(2,3)*pos_right_current(i,1);...
+            trans2(1,2) - trans2(1,3)*pos_right_current(i,2), trans2(2,2)-trans2(2,3)*pos_right_current(i,2)];
+        b_matrix = [trans2(3,3)*pos_right_current(i,1)*z_res + pos_right_current(i,1) - trans2(3,1)*z_res - trans2(4,1);...
+            trans2(3,3)*pos_right_current(i,2)*z_res + pos_right_current(i,2) - trans2(3,2)*z_res - trans2(4,2)];
         point_mapping = inv(A_matrix) * b_matrix;
         point_mapping_index = point_mapping(1,:) >= boundaries(:,1)' & point_mapping(1,:) <= boundaries(:,3)' & ...
             point_mapping(2,:) >= boundaries(:,2)' & point_mapping(2,:) <= boundaries(:,4)';
@@ -151,16 +151,16 @@ for frame = frame_start : frame_stop
         point_left = point_left(:,1:2)./point_left(:,3);
         if size(point_left, 1) > 2
             pf = polyfit(point_left(:,1),point_left(:,2),1);
-            vec2 = [pos_master_current(:,1) - point_left(1,1), pos_master_current(:,2) - point_left(1,2)];
+            vec2 = [pos_left_current(:,1) - point_left(1,1), pos_left_current(:,2) - point_left(1,2)];
             vec1 = [point_left(end,1) - point_left(1,1), point_left(end,2) - point_left(1,2)];
             d = vec1(1)^2 + vec1(2)^2;
             min_dist = zeros(size(vec2,1),1);
             r = (vec1(1)*vec2(:,1) + vec1(2)*vec2(:,2))/d;
             for j = 1 : size(vec2,1)
                 if r(j) <= 0
-                    min_dist(j) = sqrt((pos_master_current(j,1) - point_left(1,1))^2 + (pos_master_current(j,2) - point_left(1,2))^2);
+                    min_dist(j) = sqrt((pos_left_current(j,1) - point_left(1,1))^2 + (pos_left_current(j,2) - point_left(1,2))^2);
                 elseif r(j) >=1
-                    min_dist(j) = sqrt((pos_master_current(j,1) - point_left(end,1))^2 + (pos_master_current(j,2) - point_left(end,2))^2);
+                    min_dist(j) = sqrt((pos_left_current(j,1) - point_left(end,1))^2 + (pos_left_current(j,2) - point_left(end,2))^2);
                 else
                     theta = vec2(j,:) * vec1'/(norm(vec2(j,:)) * norm(vec1));
                     if theta >=1
@@ -168,7 +168,7 @@ for frame = frame_start : frame_stop
                     elseif theta <=-1
                         theta = -1;
                     end
-                    min_dist(j) = sqrt((pos_master_current(j,1) - point_left(1,1))^2 + (pos_master_current(j,2) - point_left(1,2))^2) * sin(acos(theta));
+                    min_dist(j) = sqrt((pos_left_current(j,1) - point_left(1,1))^2 + (pos_left_current(j,2) - point_left(1,2))^2) * sin(acos(theta));
                 end
             end
             
@@ -191,13 +191,13 @@ for frame = frame_start : frame_stop
         [assignment, cost] = munkres(dist_hugs');
         pairs = [];
         index_agw = [];
-        for i = 1 : pos_slave_size
+        for i = 1 : pos_right_size
             if assignment(i) ~=0
                 index_agw = [index_agw, i];
-                A_matrix = [trans2(1,1) - trans2(1,3)*pos_slave_current(i,1), trans2(2,1)-trans2(2,3)*pos_slave_current(i,1);...
-                    trans2(1,2) - trans2(1,3)*pos_slave_current(i,2), trans2(2,2)-trans2(2,3)*pos_slave_current(i,2)];
-                b_matrix = [trans2(3,3)*pos_slave_current(i,1)*z_res + pos_slave_current(i,1) - trans2(3,1)*z_res - trans2(4,1);...
-                    trans2(3,3)*pos_slave_current(i,2)*z_res + pos_slave_current(i,2) - trans2(3,2)*z_res - trans2(4,2)];
+                A_matrix = [trans2(1,1) - trans2(1,3)*pos_right_current(i,1), trans2(2,1)-trans2(2,3)*pos_right_current(i,1);...
+                    trans2(1,2) - trans2(1,3)*pos_right_current(i,2), trans2(2,2)-trans2(2,3)*pos_right_current(i,2)];
+                b_matrix = [trans2(3,3)*pos_right_current(i,1)*z_res + pos_right_current(i,1) - trans2(3,1)*z_res - trans2(4,1);...
+                    trans2(3,3)*pos_right_current(i,2)*z_res + pos_right_current(i,2) - trans2(3,2)*z_res - trans2(4,2)];
                 point_mapping = inv(A_matrix) * b_matrix;
                 point_mapping_index = point_mapping(1,:) >= boundaries(:,1)' & point_mapping(1,:) <= boundaries(:,3)' & ...
                     point_mapping(2,:) >= boundaries(:,2)' & point_mapping(2,:) <= boundaries(:,4)';
@@ -208,7 +208,7 @@ for frame = frame_start : frame_stop
                 point_3d_vec = point_3d(end,1:3) - point_3d(1,1:3);
                 point_left = point_3d * trans1;
                 point_left = point_left(:,1:2)./point_left(:,3);
-                vec2 = [pos_master_current(assignment(i),1) - point_left(1,1), pos_master_current(assignment(i),2) - point_left(1,2)];
+                vec2 = [pos_left_current(assignment(i),1) - point_left(1,1), pos_left_current(assignment(i),2) - point_left(1,2)];
                 vec1 = [point_left(end,1) - point_left(1,1), point_left(end,2) - point_left(1,2)];
                 d = vec1(1)^2 + vec1(2)^2;
                 r = (vec1(1)*vec2(1) + vec1(2) * vec2(2))./d;
@@ -216,8 +216,8 @@ for frame = frame_start : frame_stop
                 point_3d_cos_current = point_3d(1,1:3) + r * point_3d_vec;
                 
                 
-                vel = (T4_matrix * [vol_master_current(assignment(i),:)';vol_slave_current(i,:)'])';
-                pairs=[pairs;pos_master_current(assignment(i),:),pos_slave_current(i,:),point_3d_cos_current,vel,dist_hugs( assignment(i),i), vol_master_current(assignment(i),:), vol_slave_current(i,:)];
+                vel = (T4_matrix * [vol_left_current(assignment(i),:)';vol_right_current(i,:)'])';
+                pairs=[pairs;pos_left_current(assignment(i),:),pos_right_current(i,:),point_3d_cos_current,vel,dist_hugs( assignment(i),i), vol_left_current(assignment(i),:), vol_right_current(i,:)];
             end
         end
         pair_points_3d = pairs(:,5:7);
@@ -329,9 +329,9 @@ for i = 1 : size_z
     volume3d_pos((i-1) * size_x * size_y+1 : i * size_x * size_y, :) = [volume2d_pos, ones(size_x * size_y, 1) * z_res3(i)];
 end
 
-vol_master_current_map = zeros(size_xyz, 2, frame_num);
-vol_slave_current_map = zeros(size_xyz,2,frame_num);
-occupancy_master_current = zeros(size_xyz,  frame_num);
+vol_left_current_map = zeros(size_xyz, 2, frame_num);
+vol_right_current_map = zeros(size_xyz,2,frame_num);
+occupancy_left_current = zeros(size_xyz,  frame_num);
 pointnum=[];
 for frame = frame_start : frame_stop
     frame_idx = frame - frame_start+1;
@@ -344,15 +344,14 @@ for frame = frame_start : frame_stop
     %     table1 = tabulate(index);
     index1 = 1 : size(pairs1,1);
     index2=index1(index<size_xyz);
-    vol_master_current_map( index(index2), :, frame_idx) = pairs1(index2,12:13);
-    vol_slave_current_map(index(index2),:,frame_idx) = pairs1(index2,14:15);
-    occupancy_master_current(index(index2),frame_idx) = 1;
+    vol_left_current_map( index(index2), :, frame_idx) = pairs1(index2,12:13);
+    vol_right_current_map(index(index2),:,frame_idx) = pairs1(index2,14:15);
+    occupancy_left_current(index(index2),frame_idx) = 1;
 end
 
 
-pyramid_vol{1}.vol_master_current_map = vol_master_current_map;
-pyramid_vol{1}.vol_slave_current_map = vol_slave_current_map;
-pyramid_vol{1}.occupancy_master_current = occupancy_master_current;
-
+pyramid_vol{1}.vol_left_current_map = vol_left_current_map;
+pyramid_vol{1}.vol_right_current_map = vol_right_current_map;
+pyramid_vol{1}.occupancy_left_current = occupancy_left_current;
 
 
