@@ -11,8 +11,6 @@ Just download and run main.m. To generate the same figure with the paper, you ne
 
 #### Data:
 
-Dataset was contained here.
-
-#### Reference:
+Dataset is a little big, and will be contained after working with ourlibrary.
 
 
