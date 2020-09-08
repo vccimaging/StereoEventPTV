@@ -11,6 +11,14 @@ Just download and run main.m. To generate the same figure with the paper, you ne
 
 #### Data:
 
-Dataset is a little big, and will be contained after working with ourlibrary.
+Dataset is now available at [dataset](http://hdl.handle.net/10754/664999) or [dataset](https://doi.org/10.25781/KAUST-MSG02).
+
+The time slot is divided based on the less blur of the accumulated image. And for our case, the vortex is usually 0.004-0.006, the injection is 0.01.
+
+#### Contact:
+
+yuanhao.wang@kaust.edu.sa
+
+ramzi.idoughi@kaust.edu.sa 
 
 
