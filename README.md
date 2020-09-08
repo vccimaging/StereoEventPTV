@@ -7,7 +7,7 @@ YUANHAO WANG, RAMZI IDOUGHI, and WOLFGANG HEIDRICH
 
 #### Testing code:
 
-Just download and run main.m. To generate the same figure with the paper, you need postprocess with paraview.
+Just download and run main.m. To generate the same figure with the paper, you need postprocess with paraview. A matlab code 'plotFlow3d' is contained in the utils [plot3d](https://github.com/vccimaging/RainbowPIV/tree/master/RainbowPIV/tools). 
 
 #### Data:
 
