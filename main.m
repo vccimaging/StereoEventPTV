@@ -3,8 +3,8 @@ clc;
 %% 2D tracking part
 addpath('./utils');
 data_dir = './data';
-data_left_file = 'events_left_votex_2_5_2s.mat';
-data_right_file = 'events_right_votex_2_5_2s.mat';
+data_left_file = 'events_master_votex_2_5_2s.mat';
+data_right_file = 'events_slave_votex_2_5_2s.mat';
 data_left_file = fullfile(data_dir, data_left_file);
 data_right_file = fullfile(data_dir, data_right_file);
 cam_resolution = [480, 360];
